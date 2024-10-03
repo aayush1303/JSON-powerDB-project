@@ -20,54 +20,47 @@
             <!-- Roll No -->
             <div class="mb-3">
                 <label for="stuId" style="font-weight: bold;">Roll-No:</label>
-                <input type="text" class="form-control" onblur="getByKey()" id="stuId" placeholder="Enter Roll-No"
-                    style="width: 100%; margin-bottom: 20px;">
+                <input type="text" class="form-control" onblur="getByKey()" id="stuId" placeholder="Enter Roll-No" style="width: 100%; margin-bottom: 20px;">
                 <label id="stuIdMsg"></label>
             </div>
-
+    
             <!-- Student Name -->
             <div class="form-group">
                 <label for="stuName" style="font-weight: bold;">Student Full Name:</label>
-                <input type="text" class="form-control" id="stuName" placeholder="Enter Full Name" name="stuName"
-                    style="width: 100%; margin-bottom: 20px;" />
+                <input type="text" class="form-control" id="stuName" placeholder="Enter Full Name" name="stuName" style="width: 100%; margin-bottom: 20px;" />
             </div>
-
+    
             <!-- Student Class -->
             <div class="form-group">
                 <label for="stuClass" style="font-weight: bold;">Class:</label>
-                <input type="text" class="form-control" id="stuClass" placeholder="Enter Class" name="stuClass"
-                    style="width: 100%; margin-bottom: 20px;" />
+                <input type="text" class="form-control" id="stuClass" placeholder="Enter Class" name="stuClass" style="width: 100%; margin-bottom: 20px;" />
             </div>
-
+    
             <!-- Birth-Date -->
             <div class="form-group">
                 <label for="stuDOB" style="font-weight: bold;">Birth-Date:</label>
-                <input type="date" class="form-control" id="stuDOB" placeholder="Enter Birth-Date" name="stuDOB"
-                    style="width: 100%; margin-bottom: 20px;" />
+                <input type="date" class="form-control" id="stuDOB" placeholder="Enter Birth-Date" name="stuDOB" style="width: 100%; margin-bottom: 20px;" />
             </div>
-
+    
             <!-- Address -->
             <div class="form-group">
                 <label for="stuAddress" style="font-weight: bold;">Address:</label>
-                <input type="text" class="form-control" id="stuAddress" placeholder="Enter Address" name="stuAddress"
-                    style="width: 100%; margin-bottom: 20px;" />
+                <input type="text" class="form-control" id="stuAddress" placeholder="Enter Address" name="stuAddress" style="width: 100%; margin-bottom: 20px;" />
             </div>
-
+    
             <!-- Enrollment Date -->
             <div class="form-group">
                 <label for="stuEnrollDate" style="font-weight: bold;">Enrollment-Date:</label>
-                <input type="date" class="form-control" id="stuEnrollDate" placeholder="Enter Enrollment-Date"
-                    name="stuEnrollDate" style="width: 100%; margin-bottom: 30px;" />
+                <input type="date" class="form-control" id="stuEnrollDate" placeholder="Enter Enrollment-Date" name="stuEnrollDate" style="width: 100%; margin-bottom: 30px;" />
             </div>
-
+    
             <!-- Buttons -->
             <div style="text-align: center;">
                 <input type="button" class="btn btn-primary" id="empSave" value="Save" onclick="saveData();" disabled
                     style="margin-right: 10px;" />
-                <input type="button" class="btn btn-primary" id="empChange" value="Change" onclick="updateData();"
-                    disabled style="margin-right: 10px;" />
-                <input type="button" class="btn btn-primary" id="empReset" value="Reset" onClick="resetForm()"
-                    disabled />
+                <input type="button" class="btn btn-primary" id="empChange" value="Change" onclick="updateData();" disabled
+                    style="margin-right: 10px;" />
+                <input type="button" class="btn btn-primary" id="empReset" value="Reset" onClick="resetForm()" disabled />
             </div>
         </form>
     </div>
@@ -78,18 +71,18 @@
             disableButtons();
         };
         function disableButtons() {
-            $("#empSave").prop("disabled", true);
-            $("#empChange").prop("disabled", true);
-            $("#empReset").prop("disabled", true);
+        $("#empSave").prop("disabled", true);
+        $("#empChange").prop("disabled", true);
+        $("#empReset").prop("disabled", true);
         }
 
         function enableSaveButton() {
-            $("#empSave").prop("disabled", false);
+        $("#empSave").prop("disabled", false);
         }
 
         function enableChangeButton() {
-            $("#empChange").prop("disabled", false);
-            $("#empReset").prop("disabled", false);
+        $("#empChange").prop("disabled", false);
+        $("#empReset").prop("disabled", false);
         }
         function validateAndGetFormData() {
             var stuIdVar = $("#stuId").val();
@@ -142,15 +135,15 @@
             };
             return JSON.stringify(jsonStrObj);
         }
-        $("#stuId").on("input", function () {
-            let stuId = $(this).val();
-            if (stuId) {
-                enableSaveButton(); // Enable Save button when stuId has value
-                $("#empReset").prop("disabled", false);
-            } else {
-                disableButtons(); // Disable all buttons if stuId is empty
-            }
-        });
+        $("#stuId").on("input", function() {
+        let stuId = $(this).val();
+        if (stuId) {
+            enableSaveButton(); // Enable Save button when stuId has value
+            $("#empReset").prop("disabled", false);
+        } else {
+            disableButtons(); // Disable all buttons if stuId is empty
+        }
+    });
 
         function getByKey() {
             let db = "SCHOOL-DB";
@@ -158,52 +151,50 @@
             let stuId = $("#stuId").val();
             let gtb = getbykey(db, rel, stuId);
             jQuery.ajaxSetup({ async: false });
-
-            // Updated URL from HTTPS to HTTP
             var resultObj = executeCommandAtGivenBaseUrl(gtb, "http://api.login2explore.com:5577", "/api/irl");
             jQuery.ajaxSetup({ async: true });
 
             // Check if the data exists
             if (resultObj.status === 200) {
-                let data = JSON.parse(resultObj.data); // Parse the data
-                if (data && data.record) { // Check if record exists
-                    $("#stuName").val(data.record.stuName);
-                    $("#stuClass").val(data.record.stuClass);
-                    $("#stuDOB").val(data.record.stuDOB);
-                    $("#stuAddress").val(data.record.stuAddress);
-                    $("#stuEnrollDate").val(data.record.stuEnrollDate || "");
-
-                    $("#empSave").prop("disabled", true);
-                    // Enable Change and Reset buttons if data is found
-                    enableChangeButton();
-                }
-                console.log("Data retrieved successfully: ", data);
-            } else {
-                // Disable Change button if no record found and enable Save button
-                disableButtons();
-                $("#empSave").prop("disabled", false); // Enable Save button
-                console.log("No record found or an error occurred.");
+            let data = JSON.parse(resultObj.data); // Parse the data
+            if (data && data.record) { // Check if record exists
+                $("#stuName").val(data.record.stuName);
+                $("#stuClass").val(data.record.stuClass);
+                $("#stuDOB").val(data.record.stuDOB);
+                $("#stuAddress").val(data.record.stuAddress);
+                $("#stuEnrollDate").val(data.record.stuEnrollDate || "");
+                
+                $("#empSave").prop("disabled", true);
+                // Enable Change and Reset buttons if data is found
+                enableChangeButton();
             }
+            console.log("Data retrieved successfully: ", data);
+        } else {
+            // Disable Change button if no record found and enable Save button
+            disableButtons();
+            $("#empSave").prop("disabled", false); // Enable Save button
+            console.log("No record found or an error occurred.");
         }
+    }
 
         function getbykey(db, rel, stuId) {
             let bykey = `
-        {
-            "token": "90934524|-31949226542161108|90962438",
-            "dbName": "${db}",
-            "cmd": "GET_BY_KEY",
-            "rel": "${rel}",
-            "createTime": true,
-            "updateTime": true,
-            "jsonStr": {
-                "stuId": "${stuId}"
-            }
-        }
-    `;
+                {
+                    "token": "90934524|-31949226542161108|90962438",
+                    "dbName": "${db}",
+                    "cmd": "GET_BY_KEY",
+                    "rel": "${rel}",
+                    "createTime": true,
+                    "updateTime": true,
+                    "jsonStr": {
+                        "stuId": "${stuId}"
+                    }
+                }
+            `;
             return bykey;
         }
-
         function saveData() {
+
             var jsonStr = validateAndGetFormData();
             if (jsonStr === "") {
                 return;
@@ -218,8 +209,6 @@
             alert(putReqStr);
 
             jQuery.ajaxSetup({ async: false });
-
-            // Updated URL from HTTPS to HTTP
             var resultObj = executeCommandAtGivenBaseUrl(
                 putReqStr,
                 "http://api.login2explore.com:5577",
@@ -230,7 +219,6 @@
             alert(JSON.stringify(resultObj));
             resetForm();
         }
-
         function updateData() {
             let db = "SCHOOL-DB";
             let rel = "STUDENT-TABLE";
@@ -253,16 +241,14 @@
                 rel,                                     // relName
                 "UPDATE",                                // type
                 "stuId",                                 // primaryKey
-                [],
-                []
+                [],                                      
+                []                                      
             );
 
-            console.log("Update Data Request: ", data);
+            console.log("Update Data Request: ", data); 
 
             // Send the update request to the server
             jQuery.ajaxSetup({ async: false });
-
-            // Updated URL from HTTPS to HTTP
             var resultObj = executeCommandAtGivenBaseUrl(data, "http://api.login2explore.com:5577", "/api/iml/set");
             console.log("Update Response: ", JSON.stringify(resultObj)); // Debugging log
             jQuery.ajaxSetup({ async: true });
