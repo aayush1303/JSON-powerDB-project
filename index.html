@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="https://login2explore.com/jpdb/resources/js/0.0.3/jpdb-commons.js"></script>
+    <title>JSON PowerDB Project</title>
+</head>
+
+<body>
+    <div class="container">
+        <h2 style="text-align: center; margin-bottom: 20px;">Student Enrollment Form</h2>
+        <form>
+            <!-- Roll No -->
+            <div class="mb-3">
+                <label for="stuId" style="font-weight: bold;">Roll-No:</label>
+                <input type="text" class="form-control" onblur="getByKey()" id="stuId" placeholder="Enter Roll-No" style="width: 100%; margin-bottom: 20px;">
+                <label id="stuIdMsg"></label>
+            </div>
+    
+            <!-- Student Name -->
+            <div class="form-group">
+                <label for="stuName" style="font-weight: bold;">Student Full Name:</label>
+                <input type="text" class="form-control" id="stuName" placeholder="Enter Full Name" name="stuName" style="width: 100%; margin-bottom: 20px;" />
+            </div>
+    
+            <!-- Student Class -->
+            <div class="form-group">
+                <label for="stuClass" style="font-weight: bold;">Class:</label>
+                <input type="text" class="form-control" id="stuClass" placeholder="Enter Class" name="stuClass" style="width: 100%; margin-bottom: 20px;" />
+            </div>
+    
+            <!-- Birth-Date -->
+            <div class="form-group">
+                <label for="stuDOB" style="font-weight: bold;">Birth-Date:</label>
+                <input type="date" class="form-control" id="stuDOB" placeholder="Enter Birth-Date" name="stuDOB" style="width: 100%; margin-bottom: 20px;" />
+            </div>
+    
+            <!-- Address -->
+            <div class="form-group">
+                <label for="stuAddress" style="font-weight: bold;">Address:</label>
+                <input type="text" class="form-control" id="stuAddress" placeholder="Enter Address" name="stuAddress" style="width: 100%; margin-bottom: 20px;" />
+            </div>
+    
+            <!-- Enrollment Date -->
+            <div class="form-group">
+                <label for="stuEnrollDate" style="font-weight: bold;">Enrollment-Date:</label>
+                <input type="date" class="form-control" id="stuEnrollDate" placeholder="Enter Enrollment-Date" name="stuEnrollDate" style="width: 100%; margin-bottom: 30px;" />
+            </div>
+    
+            <!-- Buttons -->
+            <div style="text-align: center;">
+                <input type="button" class="btn btn-primary" id="empSave" value="Save" onclick="saveData();" disabled
+                    style="margin-right: 10px;" />
+                <input type="button" class="btn btn-primary" id="empChange" value="Change" onclick="updateData();" disabled
+                    style="margin-right: 10px;" />
+                <input type="button" class="btn btn-primary" id="empReset" value="Reset" onClick="resetForm()" disabled />
+            </div>
+        </form>
+    </div>
+
+    <script>
+        window.onload = function () {
+            document.getElementById("stuId").focus();
+            disableButtons();
+        };
+        function disableButtons() {
+        $("#empSave").prop("disabled", true);
+        $("#empChange").prop("disabled", true);
+        $("#empReset").prop("disabled", true);
+        }
+
+        function enableSaveButton() {
+        $("#empSave").prop("disabled", false);
+        }
+
+        function enableChangeButton() {
+        $("#empChange").prop("disabled", false);
+        $("#empReset").prop("disabled", false);
+        }
+        function validateAndGetFormData() {
+            var stuIdVar = $("#stuId").val();
+            if (stuIdVar === "") {
+                alert("Student Roll-No Required Value");
+                $("#stuId").focus();
+                return "";
+            }
+            var stuNameVar = $("#stuName").val();
+            if (stuNameVar === "") {
+                alert("Student Name is Required Value");
+                $("#stuName").focus();
+                return "";
+            }
+            var stuClassVar = $("#stuClass").val();
+            if (stuClassVar === "") {
+                alert("Student Class is Required Value");
+                $("#stuClass").focus();
+                return "";
+            }
+
+            var stuDOBVar = $("#stuDOB").val();
+            if (stuDOBVar === "") {
+                alert("Student Birth-Date is Required Value");
+                $("stuDOB").focus();
+                return "";
+            }
+
+            var stuAddressVar = $("#stuAddress").val();
+            if (stuAddressVar === "") {
+                alert("Student Address is Required Value");
+                $("#stuAddress").focus();
+                return "";
+            }
+
+            var stuEnrollDateVar = $("#stuEnrollDate").val();
+            if (stuEnrollDateVar === "") {
+                alert("Student Enrollment-Date is Required Value");
+                $("stuEnrollDate").focus();
+                return "";
+            }
+
+            var jsonStrObj = {
+                stuId: stuIdVar,
+                stuName: stuNameVar,
+                stuClass: stuClassVar,
+                stuDOB: stuDOBVar,
+                stuAddress: stuAddressVar,
+                stuEnrollDate: stuEnrollDateVar,
+            };
+            return JSON.stringify(jsonStrObj);
+        }
+        $("#stuId").on("input", function() {
+        let stuId = $(this).val();
+        if (stuId) {
+            enableSaveButton(); // Enable Save button when stuId has value
+            $("#empReset").prop("disabled", false);
+        } else {
+            disableButtons(); // Disable all buttons if stuId is empty
+        }
+    });
+
+        function getByKey() {
+            let db = "SCHOOL-DB";
+            let rel = "STUDENT-TABLE";
+            let stuId = $("#stuId").val();
+            let gtb = getbykey(db, rel, stuId);
+            jQuery.ajaxSetup({ async: false });
+            var resultObj = executeCommandAtGivenBaseUrl(gtb, "http://api.login2explore.com:5577", "/api/irl");
+            jQuery.ajaxSetup({ async: true });
+
+            // Check if the data exists
+            if (resultObj.status === 200) {
+            let data = JSON.parse(resultObj.data); // Parse the data
+            if (data && data.record) { // Check if record exists
+                $("#stuName").val(data.record.stuName);
+                $("#stuClass").val(data.record.stuClass);
+                $("#stuDOB").val(data.record.stuDOB);
+                $("#stuAddress").val(data.record.stuAddress);
+                $("#stuEnrollDate").val(data.record.stuEnrollDate || "");
+                
+                $("#empSave").prop("disabled", true);
+                // Enable Change and Reset buttons if data is found
+                enableChangeButton();
+            }
+            console.log("Data retrieved successfully: ", data);
+        } else {
+            // Disable Change button if no record found and enable Save button
+            disableButtons();
+            $("#empSave").prop("disabled", false); // Enable Save button
+            console.log("No record found or an error occurred.");
+        }
+    }
+
+        function getbykey(db, rel, stuId) {
+            let bykey = `
+                {
+                    "token": "90934524|-31949226542161108|90962438",
+                    "dbName": "${db}",
+                    "cmd": "GET_BY_KEY",
+                    "rel": "${rel}",
+                    "createTime": true,
+                    "updateTime": true,
+                    "jsonStr": {
+                        "stuId": "${stuId}"
+                    }
+                }
+            `;
+            return bykey;
+        }
+        function saveData() {
+
+            var jsonStr = validateAndGetFormData();
+            if (jsonStr === "") {
+                return;
+            }
+            var putReqStr = createPUTRequest(
+                "90934524|-31949226542161108|90962438",
+                jsonStr,
+                "SCHOOL-DB",
+                "STUDENT-TABLE"
+            );
+
+            alert(putReqStr);
+
+            jQuery.ajaxSetup({ async: false });
+            var resultObj = executeCommandAtGivenBaseUrl(
+                putReqStr,
+                "http://api.login2explore.com:5577",
+                "/api/iml"
+            );
+            jQuery.ajaxSetup({ async: true });
+
+            alert(JSON.stringify(resultObj));
+            resetForm();
+        }
+        function updateData() {
+            let db = "SCHOOL-DB";
+            let rel = "STUDENT-TABLE";
+
+            // Get the updated values from the form fields
+            let updatedData = {
+                stuId: $("#stuId").val(),
+                stuName: $("#stuName").val(),
+                stuClass: $("#stuClass").val(),
+                stuDOB: $("#stuDOB").val(),
+                stuAddress: $("#stuAddress").val(),
+                stuEnrollDate: $("#stuEnrollDate").val(),
+            };
+
+            // Create the update request using the updated data
+            let data = createSETRequest(
+                "90934524|-31949226542161108|90962438", // token
+                JSON.stringify(updatedData),             // jsonStr
+                db,                                      // dbName
+                rel,                                     // relName
+                "UPDATE",                                // type
+                "stuId",                                 // primaryKey
+                [],                                      
+                []                                      
+            );
+
+            console.log("Update Data Request: ", data); 
+
+            // Send the update request to the server
+            jQuery.ajaxSetup({ async: false });
+            var resultObj = executeCommandAtGivenBaseUrl(data, "http://api.login2explore.com:5577", "/api/iml/set");
+            console.log("Update Response: ", JSON.stringify(resultObj)); // Debugging log
+            jQuery.ajaxSetup({ async: true });
+
+            // Provide feedback to the user
+            if (resultObj.status === 200) {
+                alert("Data updated successfully in the database!");
+            } else {
+                alert("Failed to update data. Error: " + resultObj.message);
+            }
+        }
+
+        // Function to create the SET request
+        function createSETRequest(token, jsonStr, dbName, relName, type, primaryKey, uniqueKeys, foreignKeys) {
+            return `{
+        "token": "${token}",
+        "cmd": "SET",
+        "dbName": "${dbName}",
+        "rel": "${relName}",
+        "type": "${type}",
+        "primaryKey": "${primaryKey}",
+        "uniqueKeys": ${JSON.stringify(uniqueKeys)},
+        "foreignKeys": ${JSON.stringify(foreignKeys)},
+        "jsonStr": ${jsonStr}
+    }`;
+        }
+
+        function resetForm() {
+            $("#stuId").val("");
+            $("#stuName").val("");
+            $("#stuClass").val("");
+            $("#stuDOB").val("");
+            $("#stuAddress").val("");
+            $("#stuEnrollDate").val("");
+            $("#stuId").focus();
+            disableButtons();
+            $("#empSave").prop("disabled", false);
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+        crossorigin="anonymous"></script>
+
+</body>
+
+</html>
