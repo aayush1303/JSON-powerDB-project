@@ -6,7 +6,6 @@ It is basically a Database Server with Developer friendly REST API services.
 
 JPDB has ready to use API for Json document DB, RDBMS, Key-value DB, GeoSpatial DB and Time Series DB functionality. JPDB supports and advocates for true serverless and pluggable API development.
 
-> Website live on --> https://aayush1303.github.io/JSON-powerDB/
 
 Documentation Link --> https://login2explore.com/jpdb/docs.html#jpdb-command-request
 
